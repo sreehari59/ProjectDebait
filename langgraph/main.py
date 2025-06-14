@@ -126,7 +126,9 @@ class LangGraphDebateSystem:
     def run_debate(self):
         # Initialize state and run workflow
         state = DebateState(
-            history=[f"Debate topic: {self.topic}"],
+            history=[f"Debate topic: {self.topic}",
+                     f"🔵 side_a point: {self.side_a_point}",
+                     f"🔴 side_b point: {self.side_b_point}"],
             round=0,
             max_rounds=self.rounds
         )
