@@ -2,13 +2,16 @@ import os
 from autogen import ConversableAgent, LLMConfig
 
 class DebateSystem:
-    def __init__(self, topic):
+    def __init__(self, topic, side_a_point, side_b_point):
         self.topic = topic
+        self.side_a_point = side_a_point
+        self.side_b_point = side_b_point
         self.config_list = [
             {
                 "api_type": "mistral",
                 "model": "mistral-tiny",
                 "api_key": os.getenv("MISTRAL_API_KEY"),
+                "temperature": 0.3,  # Lower temperature for more focused responses
             }
         ]
         self.llm_config = LLMConfig(config_list=self.config_list)
@@ -18,33 +21,34 @@ class DebateSystem:
         with self.llm_config:
             self.side_a = ConversableAgent(
                 name="side_a",
-                system_message=f"""You are debating in favor of the first option in: {self.topic}.
-                Please first provide a brief opening statement.
-                Be assertive. Keep responses concise - 1 sentences maximum."""
+                system_message=f"""You are concisely arguing FOR {self.side_a_point}.
+                Make one clear, strong point per response. Don't change side, stay strong.
+                Use a 1-2 sentences maximum.
+                Never use pleasantries or acknowledgments."""
             )
 
             self.side_b = ConversableAgent(
                 name="side_b",
-                system_message=f"""You are debating in favor of the second option in: {self.topic}.
-                Please first provide a brief opening statement.
-                Be assertive. Keep responses concise - 1 sentences maximum."""
+                system_message=f"""You are concisely arguing FOR: {self.side_b_point}.
+                Make one clear, strong point per response. Don't change side, stay strong.
+                Use a 1-2 sentences maximum.
+                Never use pleasantries or acknowledgments."""
             )
 
             self.judge = ConversableAgent(
                 name="judge",
-                system_message=f"""You are an impartial judge for the debate on: {self.topic}.
-                After reviewing the debate transcript, provide a clear verdict declaring the winner.
-                Explain your decision in 2-3 sentences based on the strength of arguments, logic, and persuasiveness.
-                Format your response as:
+                system_message=f"""You are judging the debate on: {self.topic}.
+                Evaluate arguments solely on clarity, evidence, and logical reasoning.
+                Format response EXACTLY as:
                 WINNER: [side_a/side_b]
-                REASONING: [your explanation]"""
+                REASON: [one clear sentence explanation]"""
             )
 
     def run_debate(self, rounds=3):
         # Opening statements
         self.side_a.initiate_chat(
             self.side_b,
-            message=f"Let's begin our debate about {self.topic}. Here's my opening statement:",
+            message=f"Opening statement about {self.topic}:",
             max_turns=2
         )
 
@@ -87,5 +91,5 @@ class DebateSystem:
 
 if __name__ == "__main__":
     # Example usage
-    debate = DebateSystem("cats vs dogs")
+    debate = DebateSystem("bikes vs cars", "bikes are the best for Karlsruhe", "cars are the best for Germany")
     debate.run_debate(rounds=2)
