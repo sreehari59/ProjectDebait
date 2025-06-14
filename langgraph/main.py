@@ -23,7 +23,7 @@ class LangGraphDebateSystem:
             openai_api_base=os.getenv("MISTRAL_OPENAI_API_BASE", "https://api.mistral.ai/v1"),
             openai_api_key=os.getenv("MISTRAL_API_KEY"),
             model="mistral-tiny",
-            temperature=0.3,
+            temperature=0.7,
         )
 
         # Define prompts
@@ -31,24 +31,28 @@ class LangGraphDebateSystem:
             "side_a": PromptTemplate(
                 input_variables=["point", "topic", "history"],
                 template=
-                "You are concisely arguing FOR: {point}.\n"
-                "Debate topic: {topic}\nConversation so far:\n"
-                "{history}\n"
-                "Put only one concise and short argument."
-                "Don't enumerate. Your next point:"
+                "You are a passionate but professional debater arguing FOR: {point}.\n"
+                "Debate topic: {topic}\n"
+                "Context so far:\n{history}\n"
+                "Provide one clear, concise argument. Keep it under 2 sentences. Be persuasive but professional."
+                "Your argument:"
             ),
             "side_b": PromptTemplate(
                 input_variables=["point", "topic", "history"],
                 template=
-                "You are concisely arguing FOR: {point}. You're not happy and angry person. You cannot allow someone to win the debate.\n"
+                "You are a passionate but professional debater arguing FOR: {point}.\n"
                 "Debate topic: {topic}\n"
-                "Conversation so far:\n"
-                "{history}\n"
-                "Put only one concise and short argument. Your next point:"
+                "Context so far:\n{history}\n"
+                "Provide one clear, concise counterargument. Keep it under 2 sentences. Be persuasive but professional."
+                "Your argument:"
             ),
             "judge": PromptTemplate(
                 input_variables=["transcript", "topic"],
-                template="You are judging the debate on: {topic}.\nDebate transcript:\n{transcript}\nFormat response EXACTLY as:\nWINNER: [side_a/side_b]\nREASON: [one clear sentence explanation]"
+                template=
+                "You are judging a debate on: {topic}.\n"
+                "Debate transcript:\n{transcript}\n"
+                "Provide your verdict in exactly this format:\n"
+                "VERDICT: The [winning side] argument is more convincing because [one clear reason]"
             )
         }
 
@@ -69,7 +73,7 @@ class LangGraphDebateSystem:
 
         # Update state
         new_history = state.history + [f"{side}: {response.content.strip()}"]
-        new_round = state.round + (1 if side == "side_b" else 0)  # Increment round after side B speaks
+        new_round = state.round + (1 if side == "side_b" else 0)
 
         return DebateState(
             history=new_history,
@@ -88,14 +92,14 @@ class LangGraphDebateSystem:
         verdict = self.llm.invoke(msg).content.strip()
 
         return DebateState(
-            history=state.history + [f"VERDICT: {verdict}"],
+            history=state.history + [verdict],
             round=state.round,
             max_rounds=state.max_rounds,
             verdict=verdict
         )
 
     def _build_workflow(self):
-        # Create node functions with access to self
+        # Create node functions
         def side_a_node(state): return self._generate_response(state, "side_a")
         def side_b_node(state): return self._generate_response(state, "side_b")
         def judge_node(state): return self._generate_verdict(state)
@@ -117,41 +121,40 @@ class LangGraphDebateSystem:
             "end": "judge"
         })
 
-        # Define entry and exit points
         builder.set_entry_point("side_a")
         builder.add_edge("judge", END)
 
         self.workflow = builder.compile()
 
     def run_debate(self):
-        # Initialize state and run workflow
         state = DebateState(
-            history=[f"Debate topic: {self.topic}",
-                     f"🔵 side_a point: {self.side_a_point}",
-                     f"🔴 side_b point: {self.side_b_point}"],
+            history=[
+                f"Topic: {self.topic}",
+                f"Position A: {self.side_a_point}",
+                f"Position B: {self.side_b_point}"
+            ],
             round=0,
             max_rounds=self.rounds
         )
 
         final_state = self.workflow.invoke(state)
-
-        # Print results
-        for message in final_state['history']:
-            if message.startswith("side_a:"):
-                print("🔵 " + message)
-            elif message.startswith("side_b:"):
-                print("🔴 " + message)
-            elif not message.startswith("VERDICT:"):
-                print("📝 " + message)
-
-        print("\n⚖️ JUDGE'S VERDICT:")
-        print(final_state['verdict'] if final_state['verdict'] else "No verdict provided")
+        return final_state
 
 if __name__ == "__main__":
     debate = LangGraphDebateSystem(
-        topic="cats vs dogs",
-        side_a_point="cats are better pets",
-        side_b_point="dogs are better pets",
+        topic="Should remote work be the standard?",
+        side_a_point="Remote work should be the standard employment model",
+        side_b_point="Traditional office work should remain the standard",
         rounds=2
     )
-    debate.run_debate()
+    result = debate.run_debate()
+    
+    for message in result['history']:
+        if message.startswith("side_a:"):
+            print("🔵 " + message[7:])
+        elif message.startswith("side_b:"):
+            print("🔴 " + message[7:])
+        elif message.startswith("VERDICT:"):
+            print("\n⚖️ " + message)
+        else:
+            print("📝 " + message)
