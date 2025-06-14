@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AgentCard from '@/components/AgentCard';
 import JudgePulpit from '@/components/JudgePulpit';
 import TranscriptDisplay, { Message } from '@/components/TranscriptDisplay';
@@ -10,50 +10,95 @@ const initialMessages: Message[] = [
   { id: 'sys1', sender: 'System', text: 'Debate arena initializing...', timestamp: new Date().toLocaleTimeString() },
 ];
 
-const sampleDebateFlow: Array<Omit<Message, 'id' | 'timestamp'>> = [
-  { sender: 'System', text: 'The debate topic is: "Is pineapple a valid pizza topping?"' },
-  { sender: 'Agent A', text: "Greetings. I will argue that pineapple, with its sweet and tangy profile, offers a delightful contrast to savory pizza ingredients, thus making it a valid and enjoyable topping." },
-  { sender: 'Agent B', text: "I respectfully disagree. The acidity and texture of pineapple clash with the traditional flavors of pizza, creating an incongruous culinary experience. It has no place on a pizza." },
-  { sender: 'Judge', text: "Interesting opening statements. Agent A, please elaborate on your position." },
-  { sender: 'Agent A', text: "Certainly, Judge. The combination of sweet and savory is a well-established culinary principle. Think of salted caramel or honey-glazed ham. Pineapple on pizza, particularly with ingredients like ham or spicy pepperoni, provides this very balance, enhancing the overall flavor complexity." },
-  { sender: 'Agent B', text: "While sweet and savory can coexist, the specific application matters. Pineapple's high water content can make the pizza soggy, and its dominant flavor often overpowers more subtle ingredients. A pizza should be a harmonious blend, not a battle of strong flavors." },
-  { sender: 'Judge', text: "Both valid points. Let's pause here for initial thoughts. The debate will continue." },
-];
+// Default debate configuration
+const defaultDebateConfig = {
+  topic: "Is artificial intelligence beneficial for society?",
+  side_a_point: "AI brings significant benefits and advancement to society",
+  side_b_point: "AI poses serious risks and challenges to society",
+  rounds: 2
+};
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isDebateRunning, setIsDebateRunning] = useState(false);
   const [activeAgent, setActiveAgent] = useState<'A' | 'B' | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [debateMessages, setDebateMessages] = useState<string[]>([]);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isDebateRunning && currentMessageIndex < sampleDebateFlow.length) {
-      timer = setTimeout(() => {
-        const nextMessage = sampleDebateFlow[currentMessageIndex];
-        setMessages(prev => [...prev, { ...nextMessage, id: `msg${prev.length}`, timestamp: new Date().toLocaleTimeString() }]);
-        
-        if (nextMessage.sender === 'Agent A') setActiveAgent('A');
-        else if (nextMessage.sender === 'Agent B') setActiveAgent('B');
-        else setActiveAgent(null);
+    let isPlaying = true;
 
-        setCurrentMessageIndex(prev => prev + 1);
-      }, 2000 + Math.random() * 2000); // Simulate thinking time
-    } else if (currentMessageIndex >= sampleDebateFlow.length) {
-      setIsDebateRunning(false);
-      setActiveAgent(null);
+    const playNextMessage = async () => {
+      if (!isDebateRunning || currentMessageIndex >= debateMessages.length || !isPlaying) {
+        setIsDebateRunning(false);
+        setActiveAgent(null);
+        return;
+      }
+
+      const message = debateMessages[currentMessageIndex];
+      const sender = message.startsWith('side_a:') ? 'Agent A' :
+                    message.startsWith('side_b:') ? 'Agent B' :
+                    message.startsWith('VERDICT:') ? 'Judge' : 'System';
+
+      setMessages(prev => [...prev, {
+        id: `msg${prev.length}`,
+        sender,
+        text: message.replace(/^(side_a:|side_b:|VERDICT:)\s*/, ''),
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+
+      setActiveAgent(
+        sender === 'Agent A' ? 'A' :
+        sender === 'Agent B' ? 'B' : null
+      );
+
+      if (audioRef.current) {
+        audioRef.current.src = `http://localhost:5000/stream_message?message=${encodeURIComponent(message)}`;
+        await audioRef.current.play();
+        audioRef.current.onended = () => {
+          setCurrentMessageIndex(prev => prev + 1);
+        };
+      }
+    };
+
+    if (isDebateRunning) {
+      playNextMessage();
     }
-    return () => clearTimeout(timer);
-  }, [isDebateRunning, currentMessageIndex]);
 
-  const startDebate = () => {
-    if (messages.length <= 1 || currentMessageIndex >= sampleDebateFlow.length) { // Reset if at start or end
+    return () => {
+      isPlaying = false;
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [isDebateRunning, currentMessageIndex, debateMessages]);
+
+  const startDebate = async () => {
+    try {
       setMessages([
-        { id: 'sys-restart', sender: 'System', text: 'Debate restarting...', timestamp: new Date().toLocaleTimeString() }
+        { id: 'sys-restart', sender: 'System', text: 'Starting new debate...', timestamp: new Date().toLocaleTimeString() }
       ]);
+      
+      const params = new URLSearchParams({
+        ...defaultDebateConfig
+      });
+      
+      const response = await fetch(`http://localhost:5000/start_debate?${params}`);
+      const data = await response.json();
+      
+      setDebateMessages(data.messages);
       setCurrentMessageIndex(0);
+      setIsDebateRunning(true);
+    } catch (error) {
+      console.error('Failed to start debate:', error);
+      setMessages(prev => [...prev, {
+        id: `error-${Date.now()}`,
+        sender: 'System',
+        text: 'Failed to start debate. Please try again.',
+        timestamp: new Date().toLocaleTimeString()
+      }]);
     }
-    setIsDebateRunning(true);
   };
 
   const pauseDebate = () => {
@@ -81,7 +126,7 @@ const Index = () => {
       <div className="mb-6 text-center animate-fade-in" style={{animationDelay: '0.4s'}}>
         <h2 className="text-2xl font-orbitron text-judge">Debate Topic</h2>
         <p className="text-xl text-foreground mt-1">
-          {currentMessageIndex > 0 && sampleDebateFlow[0].sender === 'System' ? sampleDebateFlow[0].text.replace('The debate topic is: ','') : "Is pineapple a valid pizza topping?"}
+          {defaultDebateConfig.topic}
         </p>
       </div>
       
@@ -103,11 +148,12 @@ const Index = () => {
         <TranscriptDisplay messages={messages} />
       </div>
 
+      <audio ref={audioRef} style={{ display: 'none' }} />
       <footer className="mt-auto text-center space-x-4 py-4 animate-fade-in" style={{animationDelay: '1.4s'}}>
         {!isDebateRunning ? (
           <Button onClick={startDebate} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
             <PlayCircle className="mr-2 h-5 w-5" />
-            {currentMessageIndex >= sampleDebateFlow.length ? "Restart Debate" : "Start Debate"}
+            {currentMessageIndex >= debateMessages.length ? "Restart Debate" : "Start Debate"}
           </Button>
         ) : (
           <Button onClick={pauseDebate} size="lg" variant="secondary">

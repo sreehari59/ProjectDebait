@@ -1,5 +1,6 @@
 from langgraph_for_api import LangGraphDebateSystem, DebateState
 from flask import Flask, Response, request, jsonify
+from flask_cors import CORS
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play, stream
 from dotenv import load_dotenv
@@ -9,6 +10,7 @@ import os
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 # Voice IDs for different speakers
