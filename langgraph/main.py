@@ -76,7 +76,7 @@ class LangGraphDebateSystem:
         )
         self.side_b_prompt = PromptTemplate(
             input_variables=["history", "topic"],
-            template="You are concisely arguing FOR: {side_b_point}.\nDebate topic: {topic}\nConversation so far:\n{history}\n Put only one concise and short argument. Your next point:"
+            template="You are concisely arguing FOR: {side_b_point}. You're not happy and angry person. You cannot allow someone to win the debate.\nDebate topic: {topic}\nConversation so far:\n{history}\n Put only one concise and short argument. Your next point:"
         )
         self.judge_prompt = PromptTemplate(
             input_variables=["transcript", "topic"],
