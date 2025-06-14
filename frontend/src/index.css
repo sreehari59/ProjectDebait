@@ -1,0 +1,111 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+
+@layer base {
+  :root {
+    --background: 224 71% 4%; /* Deep Navy Blue */
+    --foreground: 210 40% 98%; /* Almost White */
+
+    --card: 223 47% 11%; /* Darker Navy for Cards */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 223 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%; /* Accent color for primary actions - Almost White */
+    --primary-foreground: 222.2 47.4% 11.2%; /* Dark blue for text on primary */
+
+    --secondary: 217.2 32.6% 17.5%; /* Lighter shade of navy */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%; /* Greyish blue for muted text */
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%; /* Deep Red */
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 25.5%; /* Slightly lighter border */
+    --input: 217.2 32.6% 17.5%;
+    --ring: 207 90% 54%; /* Electric Blue for focus rings */
+
+    --radius: 0.5rem;
+
+    /* Custom colors for agents and judge */
+    --agent-a: 207 90% 54%; /* Electric Blue */
+    --agent-a-foreground: 210 40% 98%;
+    --agent-b: 170 84% 44%; /* Sharp Teal */
+    --agent-b-foreground: 210 40% 98%;
+    --judge: 45 100% 51%; /* Gold */
+    --judge-foreground: 222.2 47.4% 11.2%;
+
+    /* Sidebar colors (if needed later, keeping dark theme consistent) */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Keeping dark mode variables same as root for a consistent dark theme */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --card: 223 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 223 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 25.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 207 90% 54%;
+    --agent-a: 207 90% 54%;
+    --agent-a-foreground: 210 40% 98%;
+    --agent-b: 170 84% 44%;
+    --agent-b-foreground: 210 40% 98%;
+    --judge: 45 100% 51%;
+    --judge-foreground: 222.2 47.4% 11.2%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-orbitron;
+  }
+}
+
