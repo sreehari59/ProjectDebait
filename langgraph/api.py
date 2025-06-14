@@ -1,4 +1,4 @@
-from main import LangGraphDebateSystem, DebateState
+from langgraph_for_api import LangGraphDebateSystem, DebateState
 from flask import Flask, Response, request, jsonify
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play, stream
