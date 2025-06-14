@@ -1,0 +1,39 @@
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+debate_env/
+venv/
+env/
+ENV/
+
+# Audio files and logs
+*.mp3
+*.wav
+audio_debate_*/
+debate_log_*.json
+audio_debate_log_*.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Log files
+*.log
