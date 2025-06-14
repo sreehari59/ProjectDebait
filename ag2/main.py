@@ -19,22 +19,25 @@ class DebateSystem:
             self.side_a = ConversableAgent(
                 name="side_a",
                 system_message=f"""You are debating in favor of the first option in: {self.topic}.
-                Make compelling arguments for your side. Be assertive but respectful.
-                Keep responses concise - 2-3 sentences maximum."""
+                Please first provide a brief opening statement.
+                Be assertive. Keep responses concise - 1 sentences maximum."""
             )
 
             self.side_b = ConversableAgent(
                 name="side_b",
                 system_message=f"""You are debating in favor of the second option in: {self.topic}.
-                Make compelling arguments for your side. Be assertive but respectful.
-                Keep responses concise - 2-3 sentences maximum."""
+                Please first provide a brief opening statement.
+                Be assertive. Keep responses concise - 1 sentences maximum."""
             )
 
             self.judge = ConversableAgent(
                 name="judge",
                 system_message=f"""You are an impartial judge for the debate on: {self.topic}.
-                Evaluate arguments from both sides based on logic, evidence, and persuasiveness.
-                At the end, decide the winner and explain your reasoning briefly."""
+                After reviewing the debate transcript, provide a clear verdict declaring the winner.
+                Explain your decision in 2-3 sentences based on the strength of arguments, logic, and persuasiveness.
+                Format your response as:
+                WINNER: [side_a/side_b]
+                REASONING: [your explanation]"""
             )
 
     def run_debate(self, rounds=3):
@@ -64,19 +67,23 @@ class DebateSystem:
         side_a_history = [msg for msg in self.side_a.chat_messages[self.side_b]]
         side_b_history = [msg for msg in self.side_b.chat_messages[self.side_a]]
         debate_history = []
-        
+
         # Merge and sort messages by timestamp
         for msg in side_a_history + side_b_history:
             debate_history.append(f"{msg['role']}: {msg['content']}")
-        
+
         debate_summary = "\n".join(debate_history)
 
-        # Have the judge communicate with side_a to deliver the verdict
-        self.judge.initiate_chat(
-            self.side_a,
-            message=f"Based on the following debate:\n\n{debate_summary}\n\nAs the judge, I will now deliver my verdict. Who won and why?",
-            max_turns=2
+        # Generate the judge's verdict
+        verdict = self.judge.generate_reply(
+            messages=[{
+                "role": "user",
+                "content": f"Based on the following debate transcript, provide your verdict:\n\n{debate_summary}"
+            }]
         )
+
+        print("\nJUDGE'S VERDICT:")
+        print(verdict['content'])
 
 if __name__ == "__main__":
     # Example usage
