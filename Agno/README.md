@@ -14,5 +14,5 @@ uv venv --python 3.12
 ```
 
 ```powershell
-uv pip install -U agno mistralai
+uv pip install -U agno mistralai sqlalchemy
 ```
