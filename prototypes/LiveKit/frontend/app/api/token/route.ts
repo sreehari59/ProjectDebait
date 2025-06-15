@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
   at.addGrant({ room, roomJoin: true, canPublish: true, canSubscribe: true });
 
   return NextResponse.json(
-    { token: await at.toJwt() },
+    { 
+      token: await at.toJwt(), 
+      wsUrl: wsUrl,
+    },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

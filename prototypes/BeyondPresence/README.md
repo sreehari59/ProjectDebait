@@ -54,6 +54,5 @@ For a quick start, deploy [LiveKit Meet](https://cloud.livekit.io/projects/p_/sa
 Taken from <https://github.com/bey-dev/bey-examples/tree/main/livekit-agent>
 
 ```sh
-pip install -r requirements.txt
 python main.py
 ```

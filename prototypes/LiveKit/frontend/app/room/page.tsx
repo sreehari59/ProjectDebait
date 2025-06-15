@@ -31,11 +31,11 @@ export default function Page() {
       try {
         const resp = await fetch(`/api/token?room=${room}&username=${name}`);
         const data = await resp.json();
+        const wsUrl = data.wsUrl;
         setToken(data.token);
         if (!mounted) return;
         if (data.token) {
-          var url = process.env.LIVEKIT_URL!;
-          await roomInstance.connect(url, data.token);
+          await roomInstance.connect(wsUrl, data.token);
         }
       } catch (e) {
         console.error(e);
