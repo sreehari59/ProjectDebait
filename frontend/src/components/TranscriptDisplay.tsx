@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from '@/lib/utils';
 
@@ -15,6 +15,14 @@ interface TranscriptDisplayProps {
 }
 
 const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ messages }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const getSenderStyles = (sender: Message['sender']) => {
     switch (sender) {
       case 'Agent Alpha':
@@ -31,7 +39,10 @@ const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ messages }) => {
   };
 
   return (
-    <ScrollArea className="h-[400px] lg:h-[500px] w-full bg-card border border-border rounded-lg p-4 shadow-inner">
+    <ScrollArea
+      ref={containerRef}
+      className="h-[400px] lg:h-[500px] w-full bg-card border border-border rounded-lg p-4 shadow-inner"
+    >
       <div className="flex flex-col space-y-4">
         {messages.map((msg, index) => (
           <div
