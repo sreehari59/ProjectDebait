@@ -160,7 +160,7 @@ const Index = () => {
         <Link to="/ai-chat">
           <Button size="lg" className="bg-primary hover:bg-primary/90">
             {/* <MessageSquare className="mr-2" size={20} /> */}
-            Chat with AI Agent
+            Debate with AI Agent
           </Button>
         </Link>
       </div>
