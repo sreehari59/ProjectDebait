@@ -1,16 +1,12 @@
 [project]
-name = "projectdebait"
+name = "beyondpresence"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "dotenv>=0.9.9",
-    "langchain[openai]>=0.3.25",
-    "langgraph>=0.4.8",
-]
-
-[tool.uv.workspace]
-members = [
-    "prototypes/BeyondPresence",
+    "livekit-agents>=1.1.1",
+    "livekit-plugins-bey>=1.1.1",
+    "livekit-plugins-openai>=1.1.1",
 ]
