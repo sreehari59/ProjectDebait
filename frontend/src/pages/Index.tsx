@@ -17,9 +17,9 @@ const initialMessages: Message[] = [
 
 // Default debate configuration
 const defaultDebateConfig = {
-  topic: "Is artificial intelligence beneficial for society?",
-  side_a_point: "AI brings significant benefits and advancement to society",
-  side_b_point: "AI poses serious risks and challenges to society",
+  topic: "Cats vs Dogs",
+  side_a_point: "Cats are great!",
+  side_b_point: "Dogs are better! They can walk with you",
   rounds: 2,
 };
 
@@ -65,11 +65,12 @@ const Index = () => {
       ]);
 
       setActiveAgent(
-        sender === "Agent A" ? "A" : sender === "Agent B" ? "B" : null,
+        sender === "Agent Alpha" ? "A" : sender === "Agent Beta" ? "B" : null,
       );
 
       if (audioRef.current) {
         audioRef.current.src = `http://localhost:5000/stream_message?message=${encodeURIComponent(message)}`;
+        audioRef.current.playbackRate = 2;
         await audioRef.current.play();
         audioRef.current.onended = () => {
           setCurrentMessageIndex((prev) => prev + 1);

@@ -160,8 +160,8 @@ def start_debate():
     # Initialize state
     state = DebateState(
         history=[f"Welcome to today's debate on {topic}.",
-                f"Side A will argue that {side_a_point}",
-                f"Side B will argue that {side_b_point}"],
+                f"Agent Alpha will argue that {side_a_point}",
+                f"Agent Beta will argue that {side_b_point}"],
         round=0,
         max_rounds=rounds
     )

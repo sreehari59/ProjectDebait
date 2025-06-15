@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 export interface Message {
   id: string;
-  sender: 'Agent A' | 'Agent B' | 'Judge' | 'System';
+  sender: 'Agent Alpha' | 'Agent Beta' | 'Judge' | 'System';
   text: string;
   timestamp: string;
 }
@@ -17,9 +17,9 @@ interface TranscriptDisplayProps {
 const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ messages }) => {
   const getSenderStyles = (sender: Message['sender']) => {
     switch (sender) {
-      case 'Agent A':
+      case 'Agent Alpha':
         return 'bg-agent-a/20 text-agent-a border-agent-a self-start rounded-r-lg rounded-bl-lg';
-      case 'Agent B':
+      case 'Agent Beta':
         return 'bg-agent-b/20 text-agent-b border-agent-b self-end rounded-l-lg rounded-br-lg';
       case 'Judge':
         return 'bg-judge/20 text-judge border-judge self-center my-2 text-center italic rounded-lg';
