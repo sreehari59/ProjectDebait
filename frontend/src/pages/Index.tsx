@@ -221,7 +221,7 @@ const Index = () => {
           >
             <PlayCircle className="mr-2 h-5 w-5" />
             {currentMessageIndex >= debateMessages.length
-              ? "Restart Debate"
+              ? "Start a new Debate"
               : "Start Debate"}
           </Button>
         ) : (
