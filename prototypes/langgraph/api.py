@@ -13,7 +13,7 @@ import os
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 # Voice IDs for different speakers
@@ -205,21 +205,25 @@ def stream_message():
 @app.route('/get_llm_verdict', methods=['GET'])
 def get_llm_verdict():
 
+    print(os.getenv("BEY_API_KEY"))
+    print(os.getenv("AGENT_ID"))
     transcript = fetch_transcript(api_key=os.getenv("BEY_API_KEY"), agent_id=os.getenv("AGENT_ID"))
-    mistral_api_key = os.getenv("MISTRAL_API_KEY")
-    model = os.getenv("MISTRAL_API_KEY_MODEL_NAME")
+    mistral_api_key = os.getenv("MISTRAL_API_KEY", os.getenv("OPENAPI_API_KEY"))
+    model = os.getenv("MISTRAL_API_KEY_MODEL_NAME", "mistral-tiny")
+
+    print('Transcript:', transcript)
 
     client = Mistral(api_key=mistral_api_key)
     topic = ""
     prompt = f"""You are judging the debate on: {topic}.
             Debate transcript: \n{transcript}.
             In the transcript the 'sender' field indicates the participant who is speaking.
-            The participants are either User or AI.
+            The participants are either User or AI Agent Smith.
             Retrun a json response with the following format:
-            [
-                "winner": "User" or "AI",
-                "reason": "one clear sentence explanation"
-            ]
+            {{
+                "winner": "User" or "Agent Smith",
+                "reason": "one clear sentence explaining why the winner's argument was better"
+            }}
             """
     chat_response = client.chat.complete(
         model = model,
@@ -231,7 +235,9 @@ def get_llm_verdict():
         ]
     )
 
-    result = extract_json(chat_response.choices[0].message.content) 
+    print('LLM response', chat_response)
+
+    result = extract_json(chat_response.choices[0].message.content)
     print("LLM Verdict:", result)
     return  jsonify(result), 200
 

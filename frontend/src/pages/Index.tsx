@@ -47,9 +47,9 @@ const Index = () => {
 
       const message = debateMessages[currentMessageIndex];
       const sender = message.startsWith("side_a:")
-        ? "Agent A"
+        ? "Agent Alpha"
         : message.startsWith("side_b:")
-          ? "Agent B"
+          ? "Agent Beta"
           : message.startsWith("VERDICT:")
             ? "Judge"
             : "System";
@@ -144,9 +144,9 @@ const Index = () => {
           className="text-5xl lg:text-6xl font-orbitron font-bold text-primary animate-fade-in"
           style={{ animationDelay: "0s" }}
         >
-          Project <span className="text-agent-a">De</span>
-          <span className="text-agent-b">ba</span>
-          <span className="text-judge">it</span>
+          Project <span className="text-agent-a">Deb</span>
+          <span className="text-agent-b">ai</span>
+          <span className="text-agent-a">t</span>
         </h1>
         <p
           className="text-muted-foreground text-lg mt-2 animate-fade-in"

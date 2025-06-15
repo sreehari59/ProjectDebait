@@ -15,6 +15,7 @@ def fetch_transcript(api_key: str, agent_id: str) -> Dict[str, Any]:
             f"Error fetching calls: {calls_response.status_code} - {calls_response.text}"
         )
         exit(1)
+    print(calls_response.json())
     calls = calls_response.json()
     for call in calls:
         if call["agent_id"] != agent_id:
@@ -39,7 +40,7 @@ def fetch_transcript(api_key: str, agent_id: str) -> Dict[str, Any]:
             )
             continue
 
-        print("Messages:")
+        print("Messages:", messages_response.json())
 
         return messages_response.json()
     

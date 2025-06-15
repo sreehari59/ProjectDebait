@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 const AiChat = () => {
   const [isListening, setIsListening] = useState(false);
   const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
+  const [judgeVerdict, setJudgeVerdict] = useState<string | null>(null);
+  const [judgeReason, setJudgeReason] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleMicToggle = () => {
@@ -15,9 +17,24 @@ const AiChat = () => {
     console.log("Microphone toggled:", !isListening);
   };
 
-  const handleJudgeVerdict = () => {
-    // TODO: Implement judge verdict request
-    console.log("Judge verdict requested");
+  const handleJudgeVerdict = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/get_llm_verdict", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch judge verdict");
+      }
+      const data = await response.json();
+      setJudgeVerdict(data.winner);
+      setJudgeReason(data.reason);
+    } catch (error) {
+      console.error("Error fetching judge verdict:", error);
+      setJudgeVerdict("An error occurred while fetching the judge verdict.");
+    }
   };
 
   // Simulate agent speaking animation
@@ -53,7 +70,7 @@ const AiChat = () => {
           <Card className="bg-card/50 backdrop-blur-sm border-2 border-primary/20">
             <CardHeader>
               <CardTitle className="text-xl font-orbitron text-center">
-                AI Agent
+                Agent Smith
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -115,6 +132,23 @@ const AiChat = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Display Judge Verdict */}
+            {judgeVerdict && (
+              <Card className="bg-card/50 backdrop-blur-sm border-2 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-lg font-orbitron text-center">
+                    Judge Verdict
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-center text-lg font-medium text-primary">
+                    {judgeVerdict}
+                  </p>
+                  <p>{judgeReason}</p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Status Information */}
             <Card className="bg-card/50 backdrop-blur-sm border-2 border-primary/20">
