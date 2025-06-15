@@ -60,8 +60,8 @@ const AiChat = () => {
               <div className="relative h-[600px] bg-gradient-to-br from-primary/10 to-accent/20 rounded-lg overflow-hidden border-2 border-primary/30">
                 {/* Agent Video iframe */}
                 <iframe
-                  src="https://bey.chat/defaultAgent"
-                  // src="https://bey.chat/d679ac10-7030-418b-bb67-0166e0ca966"
+                  // src="https://bey.chat/defaultAgent"
+                  src="https://bey.chat/2862f4c4-3ecf-4c6e-8b32-70dff029dc0a"
                   allow="camera; microphone"
                   allowFullScreen
                   className="absolute inset-0 w-full h-full border-0"
