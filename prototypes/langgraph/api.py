@@ -6,6 +6,9 @@ from elevenlabs import play, stream
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, END
 from langchain.chat_models import ChatOpenAI
+from mistralai import Mistral
+import requests
+from utils import fetch_transcript, extract_json
 import os
 
 load_dotenv()
@@ -198,6 +201,40 @@ def stream_message():
                 yield chunk
 
     return Response(generate(), mimetype='audio/mpeg')
+
+@app.route('/get_llm_verdict', methods=['GET'])
+def get_llm_verdict():
+
+    transcript = fetch_transcript(api_key=os.getenv("BEY_API_KEY"), agent_id=os.getenv("AGENT_ID"))
+    mistral_api_key = os.getenv("MISTRAL_API_KEY")
+    model = os.getenv("MISTRAL_API_KEY_MODEL_NAME")
+
+    client = Mistral(api_key=mistral_api_key)
+    topic = ""
+    prompt = f"""You are judging the debate on: {topic}.
+            Debate transcript: \n{transcript}.
+            In the transcript the 'sender' field indicates the participant who is speaking.
+            The participants are either User or AI.
+            Retrun a json response with the following format:
+            [
+                "winner": "User" or "AI",
+                "reason": "one clear sentence explanation"
+            ]
+            """
+    chat_response = client.chat.complete(
+        model = model,
+        messages = [
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ]
+    )
+
+    result = extract_json(chat_response.choices[0].message.content) 
+    print("LLM Verdict:", result)
+    return  jsonify(result), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
