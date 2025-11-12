@@ -6,6 +6,10 @@ As a stretch goal a forth agent (coach) optimizes the losing agents prompt and t
 
 [Result Presentation](https://www.canva.com/design/DAGqZ-tM9oA/EexpPjRlaOjCbpoWjshZLQ/view?utm_content=DAGqZ-tM9oA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf39e1a9da7)
 
+# Application
+[![Watch the video](assets/app.png)](https://www.youtube.com/watch?v=cN6WcZtdU-w)
+
+
 ## Installation 
 Please use the below steps to run the back end code
 - Clone the repository
@@ -28,3 +32,4 @@ BEY_API_KEY="BEYOND_PRESENCE_API_KEY"
 3. LangGraph
 4. Agno
 5. AgentsSDK
+
